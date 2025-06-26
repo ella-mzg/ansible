@@ -58,7 +58,7 @@ services:
       - ansible_net
 
   quiz-ansible:
-    image: ftutorials/quiz:ansible-1
+    image: ftutorials/quiz:ansible-4
     container_name: quiz-ansible
     ports:
       - "3000:3000"
