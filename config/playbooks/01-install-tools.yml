@@ -1,0 +1,62 @@
+---
+
+- name: Check and install Docker, k3d, and kubectl
+  hosts: all
+
+  vars:
+    k3d_version: "v5.8.3"
+    kubectl_version: "v1.33.2"
+
+  tasks: 
+  - name: Check if Docker is installed
+    command: docker --version
+    register: docker_check
+    failed_when: false
+
+  - name: Check if k3d is installed
+    command: k3d version
+    register: k3d_check
+    failed_when: false
+
+  - name: Check if kubectl is installed
+    command: kubectl version --client=true --output=yaml
+    register: kubectl_check
+    failed_when: false
+
+  - name: Install Docker (Debian)
+    apt:
+      name: docker.io
+      state: present
+      update_cache: true
+    when:
+      - docker_check.rc != 0
+      - ansible_facts['os_family'] == "Debian"
+
+  - name: Install Docker (RHEL)
+    yum:
+      name: docker
+      state: present
+    when:
+      - docker_check.rc != 0
+      - ansible_facts['os_family'] == "Redhat"
+
+  - name: Install k3d if not present
+    get_url:
+      url: "https://github.com/k3d-io/k3d/releases/download/{{ k3d_version }}/k3d-linux-amd64"
+      dest: /usr/local/bin/k3d
+      mode: '0755'
+    when: k3d_check.rc != 0
+
+  - name: Install kubectl if not present
+    shell: |
+      curl -LO "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+      install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      rm kubectl
+    when: kubectl_check.rc != 0
+ 
+  - name: Show tool status
+    debug:
+      msg: |
+        Docker: {{ 'OK' if docker_check.rc == 0 else 'Installed' }}
+        k3d: {{ 'OK' if k3d_check.rc == 0 else 'Installed' }}
+        kubectl: {{ 'OK' if kubectl_check.rc == 0 else 'Installed (v{{ kubectl_version }})' }}

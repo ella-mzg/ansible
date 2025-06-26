@@ -3,7 +3,7 @@
 services:
   ansible:
     hostname: ansible
-    image: ftutorials/ubuntu-ssh:1.0
+    image: ftutorials/ubuntu-ansible:1.0
     container_name: ansible
     ports:
       - "2222:22"
