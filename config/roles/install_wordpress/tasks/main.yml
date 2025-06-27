@@ -1,13 +1,13 @@
 #SPDX-License-Identifier: MIT-0
 ---
-- name: Install Apache, PHP, MariaDB (Ubuntu)
+- name: Install Apache, PHP, MariaDB (Debian)
   apt:
     name: "{{ ubuntu_packages }}"
     state: present
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Install Apache, PHP, MariaDB (Rocky)
+- name: Install Apache, PHP, MariaDB (RHEL)
   yum:
     name: "{{ rocky_packages }}"
     state: present
@@ -56,7 +56,8 @@
     name: "{{ 'python3-pymysql' if ansible_os_family == 'Debian' else 'python3-PyMySQL' }}"
     state: present
 
-# - name: Secure MariaDB installation
-#   include_tasks: secure-mariadb.yml
+- name: Secure MariaDB installation
+  include_tasks: secure-mariadb.yml
+
 - name: Include WordPress install tasks
   include_tasks: install-wordpress.yml

@@ -1,10 +1,51 @@
-- name: Set up DB for WordPress
-  shell: |
-    mysql -uroot <<EOF
-    CREATE DATABASE IF NOT EXISTS {{ wp_db_name }};
-    CREATE USER IF NOT EXISTS '{{ wp_db_user }}'@'localhost' IDENTIFIED BY '{{ wp_db_password }}';
-    GRANT ALL PRIVILEGES ON {{ wp_db_name }}.* TO '{{ wp_db_user }}'@'localhost';
-    FLUSH PRIVILEGES;
-    EOF
-  register: setup_db_result
+# SPDX-License-Identifier: MIT-0
+---
+- name: Wait for MariaDB to accept root login
+  wait_for:
+    port: 3306
+    host: 127.0.0.1
+    delay: 3
+    timeout: 30
+    state: started
+
+- name: Remove anonymous users
+  mysql_user:
+    name: ""
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+
+- name: Drop test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+
+- name: Remove test DB privileges
+  mysql_user:
+    name: ""
+    host: localhost
+    priv: "test.*:ALL"
+    state: absent
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
   ignore_errors: true
+
+- name: Create WordPress database
+  mysql_db:
+    name: "{{ wp_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+
+- name: Create WordPress user
+  mysql_user:
+    name: "{{ wp_db_user }}"
+    password: "{{ wp_db_password }}"
+    priv: "{{ wp_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
