@@ -2,67 +2,72 @@
 
 ## Description
 
-Ce rôle Ansible installe automatiquement WordPress avec une base de données MariaDB sur des systèmes Ubuntu **et** Rocky Linux, qu’ils soient classiques ou conteneurisés.
+Ce rôle Ansible installe et configure automatiquement un site WordPress avec Apache, PHP et MariaDB. Il est compatible avec les systèmes **Debian-based (Ubuntu)** et **RedHat-based (Rocky Linux)**, en environnement classique ou conteneurisé.
 
-Il configure :
+## Fonctionnalités
 
-- Apache (ou httpd)
-- PHP
-- MariaDB avec création de base, utilisateur et mot de passe
-- WordPress dans `/var/www/html`
-- Le fichier `wp-config.php` avec les bonnes valeurs
-- Les permissions adéquates sur les fichiers
-- Un handler pour redémarrer Apache si besoin
-
-## Compatibilité
-
-Support des environnements, Debian, RHEL, Docker/LXC
-
-## Rôle disponible sur Ansible Galaxy
-
-```bash
-ansible-galaxy role install ella-mzg.install_wordpress
-```
+- Installation conditionnelle des paquets nécessaires (Apache/HTTPD, PHP, MariaDB)
+- Démarrage compatible container ou VM classique
+- Sécurisation de l'installation MariaDB
+- Création de la base de données WordPress
+- Déploiement et configuration automatique de WordPress
+- Support des handlers et des variables
 
 ## Variables par défaut
 
+Les variables peuvent être surchargées dans votre playbook :
+
 ```yaml
-# Service Apache
-apache_service: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
-apache_service_path: "{{ '/usr/sbin/apache2' if ansible_os_family == 'Debian' else '/usr/sbin/httpd' }}"
+apache_service: apache2 (ou httpd)
+apache_service_path: /usr/sbin/apache2 (ou /usr/sbin/httpd)
 
-# Paquets nécessaires
-ubuntu_packages:
-  - apache2
-  - php
-  - libapache2-mod-php
-  - php-mysql
-  - mariadb-server
-  - wget
-  - unzip
-
-rocky_packages:
-  - httpd
-  - php
-  - php-mysqlnd
-  - mariadb-server
-  - wget
-  - unzip
-
-# Base de données WordPress
 wp_db_name: wordpress
 wp_db_user: example
 wp_db_password: examplePW
 wp_db_root_password: examplerootPW
 ```
 
-## Exemple de Playbook
+Les paquets sont gérés en fonction de la distribution avec `ubuntu_packages` et `rocky_packages`.
+
+## Utilisation
+
+Exemple de playbook :
 
 ```yaml
-- name: Déploiement de WordPress
+- name: Déployer WordPress
   hosts: all
   roles:
-    - ella-mzg.install_wordpress
+    - role: ella-mzg.install_wordpress
+```
+
+## Structure du rôle
+
+```
+install_wordpress/
+├── defaults/
+│   └── main.yml
+├── handlers/
+│   └── main.yml
+├── meta/
+│   └── main.yml
+├── tasks/
+│   ├── main.yml
+│   ├── install-wordpress.yml
+│   └── secure-mariadb.yml
+├── templates/
+│   └── wp-config.php.j2
+└── README.md
+```
+
+## Compatibilité
+
+- Testé avec Ubuntu et Rocky Linux
+- Fonctionne en mode systemd ou conteneur (Docker/LXC)
+
+## Installation depuis Galaxy
+
+```bash
+ansible-galaxy role install ella-mzg.install_wordpress
 ```
 
 ## Licence
@@ -71,4 +76,4 @@ MIT
 
 ## Auteur
 
-Ella (ella-mzg)
+Ella Mzoughi
