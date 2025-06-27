@@ -1,0 +1,3 @@
+- hosts: all
+  roles:
+    - ella-mzg.install_wordpress
