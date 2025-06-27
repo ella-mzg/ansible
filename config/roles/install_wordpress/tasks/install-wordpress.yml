@@ -1,0 +1,27 @@
+---
+- name: Download WordPress
+  get_url:
+    url: https://wordpress.org/latest.zip
+    dest: /tmp/wordpress.zip
+
+- name: Unzip WordPress
+  unarchive:
+    src: /tmp/wordpress.zip
+    dest: /var/www/html
+    remote_src: yes
+    extra_opts: ["-o"]
+
+- name: Set ownership and permissions
+  file:
+    path: /var/www/html
+    owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+    group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+    recurse: yes
+
+- name: Copy wp-config.php
+  template:
+    src: wp-config.php.j2
+    dest: /var/www/html/wp-config.php
+    owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+    group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
+    mode: "0640"

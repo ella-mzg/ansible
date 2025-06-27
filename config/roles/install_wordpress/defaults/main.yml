@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+apache_service: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+apache_service_path: "{{ '/usr/sbin/apache2' if ansible_os_family == 'Debian' else '/usr/sbin/httpd' }}"
+
+ubuntu_packages:
+  - apache2
+  - php
+  - libapache2-mod-php
+  - php-mysql
+  - mariadb-server
+  - wget
+  - unzip
+
+rocky_packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - mariadb-server
+  - wget
+  - unzip
+
+wp_db_name: wordpress
+wp_db_user: example
+wp_db_password: examplePW
+wp_db_root_password: examplerootPW
+
+mariadb_start_cmd: >-
+  {{ 'mysqld_safe --datadir=/var/lib/mysql &' if ansible_os_family == 'Debian'
+     else 'mysqld_safe --basedir=/usr --datadir=/var/lib/mysql &' }}

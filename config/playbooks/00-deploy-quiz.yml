@@ -1,5 +1,0 @@
----
-- name: Deploy quiz app using role
-  hosts: all
-  roles:
-    - ansible-role-quiz

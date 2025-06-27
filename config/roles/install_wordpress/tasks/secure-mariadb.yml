@@ -1,0 +1,10 @@
+- name: Set up DB for WordPress
+  shell: |
+    mysql -uroot <<EOF
+    CREATE DATABASE IF NOT EXISTS {{ wp_db_name }};
+    CREATE USER IF NOT EXISTS '{{ wp_db_user }}'@'localhost' IDENTIFIED BY '{{ wp_db_password }}';
+    GRANT ALL PRIVILEGES ON {{ wp_db_name }}.* TO '{{ wp_db_user }}'@'localhost';
+    FLUSH PRIVILEGES;
+    EOF
+  register: setup_db_result
+  ignore_errors: true

@@ -1,5 +1,0 @@
----
-- name: Use the quiz role
-  hosts: all
-  roles:
-    - ella-mzg.quiz
