@@ -67,7 +67,7 @@ wp_db_root_password: examplerootPW
 
 ## Licence
 
-MIT-0
+MIT
 
 ## Auteur
 
